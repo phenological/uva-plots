@@ -1,10 +1,10 @@
 
-# mva.methods
+# uva.plots
 
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of mva.methods is to ...
+The goal of uva.plots is to ...
 
 ## Installation
 
@@ -12,7 +12,7 @@ You can install the development version of mva.methods from [GitHub](https://git
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("phenological/mva-methods")
+devtools::install_github("phenological/uva.plots")
 ```
 
 ## Example
@@ -20,7 +20,7 @@ devtools::install_github("phenological/mva-methods")
 This is a basic example which shows you how to solve a common problem:
 
 ``` r
-library(mva.methods)
+library(uva.plots)
 ## basic example code
 ```
 
