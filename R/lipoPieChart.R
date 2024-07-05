@@ -1,4 +1,4 @@
-pieChart <- function(data, multiCohort = F){
+pieChart <- function(data, cohort, multiCohort = F){
 
  #create data frame
   if(is(data)[1] == "dataElement"){
@@ -115,6 +115,8 @@ pieChart <- function(data, multiCohort = F){
    perc[[col]] <- round(df[[col]] / calc[[calc_col]], 4) * 100
  }
 
-
+ 
+ colnames(perc)[colnames(perc) %in% c("HDCE", "VLCE", "IDCE", "LDCE")] <- paste0(colnames(perc)[colnames(perc) %in% c("HDCE", "VLCE", "IDCE", "LDCE")], "_perc")
+ 
 
 }
