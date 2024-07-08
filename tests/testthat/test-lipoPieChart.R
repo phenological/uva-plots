@@ -334,30 +334,11 @@ test_that("lipoprotein data frame made correctly ", {
   
   colnames(perc)[colnames(perc) %in% c("HDCE", "VLCE", "IDCE", "LDCE")] <- paste0(colnames(perc)[colnames(perc) %in% c("HDCE", "VLCE", "IDCE", "LDCE")], "_perc")
   
+  #there should not be an duplicates of names from calc in perc. If there is, change them to have _perc.
+  m <- colnames(calc) %in% colnames(perc)
+  expect_false(object = TRUE %in% m)
   
   
-  
-  actual <- colnames(perc)
-  expected = c('HDCE', 'VLCE', 'IDCE', 'LDCE', 'VLPN', 'IDPN', 'H1CE', 'H2CE',
-               'H3CE', 'H4CE', 'V1CE', 'V2CE', 'V3CE', 'V4CE', 'V5CE', 'L1CE',
-               'L2CE', 'L3CE', 'L4CE', 'L5CE', 'L6CE', 'HDTG', 'HDCH', 'HDFC',
-               'HDPL', 'VLTG', 'VLCH', 'VLFC', 'VLPL', 'IDTG', 'IDCH', 'IDFC',
-               'IDPL', 'LDTG', 'LDCH', 'LDFC', 'LDPL', 'H1A1', 'H2A1', 'H3A1',
-               'H4A1', 'H1A2', 'H2A2', 'H3A2', 'H4A2', 'L1AB', 'L2AB', 'L3AB',
-               'L4AB', 'L5AB', 'L6AB', 'L1PN', 'L2PN', 'L3PN', 'L4PN', 'L5PN',
-               'L6PN', 'H1TG', 'H2TG', 'H3TG', 'H4TG', 'H1CH', 'H2CH', 'H3CH',
-               'H4CH', 'H1FC', 'H2FC', 'H3FC', 'H4FC', 'H1PL', 'H2PL', 'H3PL',
-               'H4PL', 'V1TG', 'V2TG', 'V3TG', 'V4TG', 'V5TG', 'V1CH', 'V2CH',
-               'V3CH', 'V4CH', 'V5CH', 'V1FC', 'V2FC', 'V3FC', 'V4FC', 'V5FC',
-               'V1PL', 'V2PL', 'V3PL', 'V4PL', 'V5PL', 'L1TG', 'L2TG', 'L3TG',
-               'L4TG', 'L5TG', 'L6TG', 'L1CH', 'L2CH', 'L3CH', 'L4CH', 'L5CH',
-               'L6CH', 'L1FC', 'L2FC', 'L3FC', 'L4FC', 'L5FC', 'L6FC', 'L1PL',
-               'L2PL', 'L3PL', 'L4PL', 'L5PL', 'L6PL')
-
-  same <- setequal(actual, expected)
-
-  expect_true(object = same)
-
 })
 
 test_that("table is made", {
@@ -392,11 +373,11 @@ all[is.na(all)] <- 0
 all[sapply(all, is.infinite)] <- 0
 ########tables######
 tableCombos = list(`Lipoprotein Composition` = c("HDCE", "HDTL", "IDCE", "IDTL", "LDCE", "LDTL", "TBPN", "VLCE", "VLTL"),
-                   `particle numbers` = c("TBPN", "VLPN","IDPN","L1PN","L2PN","L3PN","L4PN","L5PN","L6PN"),
-                   `HDL` = c("HDTG", "HDCH", "HDFC", "HDCE_perc", "HDPL"),
-                   `LDL` = c("LDCE_perc", "LDCH", "LDFC", "LDPL", "LDTG"),
-                   `IDL` = c("IDCE_perc", "IDCH", "IDFC", "IDPL", "IDPN", "IDTG"),
-                   `VLDL` = c("VLCE_perc", "VLCH", "VLFC", "VLPL", "VLPN", "VLTG")
+                   `Particle Numbers` = c("TBPN", "VLPN","IDPN","L1PN","L2PN","L3PN","L4PN","L5PN","L6PN"),
+                   `HDL Distribution` = c("HDTG", "HDCH", "HDFC", "HDCE_perc", "HDPL"),
+                   `LDL Distribution` = c("LDCE_perc", "LDCH", "LDFC", "LDPL", "LDTG"),
+                   `IDL Distribution` = c("IDCE_perc", "IDCH", "IDFC", "IDPL", "IDPN", "IDTG"),
+                   `VLDL Distribution` = c("VLCE_perc", "VLCH", "VLFC", "VLPL", "VLPN", "VLTG")
                    )
 
 # cat(paste(shQuote((VLDL[["PL"]]), type = "cmd"), collapse=", "))
@@ -406,22 +387,22 @@ tableCombos = list(`Lipoprotein Composition` = c("HDCE", "HDTL", "IDCE", "IDTL",
 subfractions <- TRUE
 if(subfractions == T){
   tableCombos = list(`main` = tableCombos,
-                     `LDL` = list(`TG` = c("L1TG", "L2TG", "L3TG", "L4TG", "L5TG", "L6TG", "LDTG"),
+                     `LDL Subfraction` = list(`TG` = c("L1TG", "L2TG", "L3TG", "L4TG", "L5TG", "L6TG", "LDTG"),
                                   `CH` = c("L1CH", "L2CH", "L3CH", "L4CH", "L5CH", "L6CH", "LDCH"),
                                   `FC` = c("L1FC", "L2FC", "L3FC", "L4FC", "L5FC", "L6FC", "LDFC"), 
-                                  `CE` = c("L1CE", "L2CE", "L3CE", "L4CE", "L5CE", "L6CE", "LDCE_perc"),
+                                  `CE` = c("L1CE", "L2CE", "L3CE", "L4CE", "L5CE", "L6CE", "LDCE"),
                                   `PL` = c("L1PL", "L2PL", "L3PL", "L4PL", "L5PL", "L6PL", "LDPL")),
-                     `HDL` = list(`TG` = c("H1TG", "H2TG", "H3TG", "H4TG", "HDTG"), 
+                     `HDL Subfraction` = list(`TG` = c("H1TG", "H2TG", "H3TG", "H4TG", "HDTG"), 
                                   `CH` = c("H1CH", "H2CH", "H3CH", "H4CH", "HDCH"), 
                                   `FC` = c("H1FC", "H2FC", "H3FC", "H4FC", "HDFC"), 
-                                  `CE` = c("H1CE", "H2CE", "H3CE", "H4CE", "HDCE_perc"), 
+                                  `CE` = c("H1CE", "H2CE", "H3CE", "H4CE", "HDCE"), 
                                   `PL` = c("H1PL", "H2PL", "H3PL", "H4PL", "HDPL")), 
-                     `VLDL` = list(`TG` = c("V1TG", "V2TG", "V3TG", "V4TG", "V5TG", "VLTG"), 
+                     `VLDL Subfraction` = list(`TG` = c("V1TG", "V2TG", "V3TG", "V4TG", "V5TG", "VLTG"), 
                                    `CH` = c("V1CH", "V2CH", "V3CH", "V4CH", "V5CH", "VLCH"), 
                                    `FC` = c("V1FC", "V2FC", "V3FC", "V4FC", "V5FC", "VLFC"), 
-                                   `CE` = c("V1CE", "V2CE", "V3CE", "V4CE", "V5CE", "VLCE_perc"), 
+                                   `CE` = c("V1CE", "V2CE", "V3CE", "V4CE", "V5CE", "VLCE"), 
                                    `PL` = c("V1PL", "V2PL", "V3PL", "V4PL", "V5PL", "VLPL")))
-}
+} else {tableCombos = list(`main` = tableCombos)}
 
 
 
@@ -437,10 +418,7 @@ combinations <- combn(unique_factors, 2)
 # Create column names from the combinations with the larger letter first
 column_names <- apply(combinations, 2, function(x) paste(sort(x, decreasing = TRUE), collapse = "-"))
 
-
-# Define the lipoproteins vector
-# lipoproteins <- c("HDTL", "HDCE", "VLTL", "VLCE", "IDTL", "IDCE", "LDTL", "LDCE", "TBPN") #"HDA1", "HDA2", "LDAB")
-
+#create a list for the table and fill them with all combinations of groups for significance
 trial <- list()
 for(j in names(tableCombos)){
   for(i in names(tableCombos[[j]])){
@@ -506,6 +484,9 @@ for(j in names(tableCombos)){
     colnames(result) <- new_colnames
     
     tble <- merge(result, sig, by.x = "variable", by.y = "lipoproteins")
+    
+    #remove the _perc where necessary
+    tble$variable <- gsub(pattern = "_perc", replacement = "", x = tble$variable)
     
     trial[[j]][[i]] <- tble
     
@@ -592,43 +573,54 @@ for(j in names(tableCombos)){
 # }
 #####plots######
 plotCombos <- list(`Lipoprotein Composition` = c("HDTL", "IDTL", "LDTL", "VLTL"),
-                   `particle numbers` = c("VLPN","IDPN","L1PN","L2PN","L3PN","L4PN","L5PN","L6PN"),
-                   `HDL` = c("HDTG" , "HDFC", "HDCE_perc" , "HDPL" ),
-                   `LDL` = c("LDCE_perc" , "LDFC" , "LDPL", "LDTG" ),
-                   `IDL` = c("IDCE_perc" , "IDFC", "IDPL" , "IDTG"),
-                   `VLDL` = c("VLCE_perc", "VLFC", "VLPL", "VLTG"))
+                   `Particle Numbers` = c("VLPN","IDPN","L1PN","L2PN","L3PN","L4PN","L5PN","L6PN"),
+                   `HDL Distribution` = c("HDTG" , "HDFC", "HDCE_perc" , "HDPL" ),
+                   `LDL Distribution` = c("LDCE_perc" , "LDFC" , "LDPL", "LDTG" ),
+                   `IDL Distribution` = c("IDCE_perc" , "IDFC", "IDPL" , "IDTG"),
+                   `VLDL Distribution` = c("VLCE_perc", "VLFC", "VLPL", "VLTG"))
 
 newnames <- list(
   `Lipoprotein Composition` = c("HDTL" = "HDL", "IDTL" = "IDL", "LDTL" = "LDL", "VLTL" = "VLDL"),
-  `particle numbers` = c("VLPN" = "VLDL", "IDPN" = "IDL", "L1PN" = "LDL1", "L2PN" = "LDL2", "L3PN" = "LDL3", "L4PN" = "LDL4", "L5PN" = "LDL5", "L6PN" = "LDL6"),
-  `HDL` = c("HDTG" = "TG", "HDFC" = "FC", "HDCE_perc" = "CE", "HDPL" = "PL"),
-  `LDL` = c("LDCE_perc" = "CE", "LDFC" = "FC", "LDPL" = "PL", "LDTG" = "TG"),
-  `IDL` = c("IDCE_perc" = "CE", "IDFC" = "FC", "IDPL" ="PL", "IDTG" ="TG"),
-  `VLDL` = c("VLCE_perc" = "CE", "VLFC" = "FC", "VLPL" = "PL", "VLTG" = "TG")
+  `Particle Numbers` = c("VLPN" = "VLDL", "IDPN" = "IDL", "L1PN" = "LDL1", "L2PN" = "LDL2", "L3PN" = "LDL3", "L4PN" = "LDL4", "L5PN" = "LDL5", "L6PN" = "LDL6"),
+  `HDL Distribution` = c("HDTG" = "TG", "HDFC" = "FC", "HDCE_perc" = "CE", "HDPL" = "PL"),
+  `LDL Distribution` = c("LDCE_perc" = "CE", "LDFC" = "FC", "LDPL" = "PL", "LDTG" = "TG"),
+  `IDL Distribution` = c("IDCE_perc" = "CE", "IDFC" = "FC", "IDPL" ="PL", "IDTG" ="TG"),
+  `VLDL Distribution` = c("VLCE_perc" = "CE", "VLFC" = "FC", "VLPL" = "PL", "VLTG" = "TG")
 )
 
-plotComboSubf <- list(`LDL` = list(`TG` = c("L1TG", "L2TG", "L3TG", "L4TG", "L5TG", "L6TG", "LDTG"),
-                                   `CH` = c("L1CH", "L2CH", "L3CH", "L4CH", "L5CH", "L6CH", "LDCH"),
-                                   `FC` = c("L1FC", "L2FC", "L3FC", "L4FC", "L5FC", "L6FC", "LDFC"), 
-                                   `CE` = c("L1CE", "L2CE", "L3CE", "L4CE", "L5CE", "L6CE", "LDCE_perc"),
-                                   `PL` = c("L1PL", "L2PL", "L3PL", "L4PL", "L5PL", "L6PL", "LDPL")),
-                      `HDL` = list(`TG` = c("H1TG", "H2TG", "H3TG", "H4TG", "HDTG"), 
-                                   `CH` = c("H1CH", "H2CH", "H3CH", "H4CH", "HDCH"), 
-                                   `FC` = c("H1FC", "H2FC", "H3FC", "H4FC", "HDFC"), 
-                                   `CE` = c("H1CE", "H2CE", "H3CE", "H4CE", "HDCE_perc"), 
-                                   `PL` = c("H1PL", "H2PL", "H3PL", "H4PL", "HDPL")), 
-                      `VLDL` = list(`TG` = c("V1TG", "V2TG", "V3TG", "V4TG", "V5TG", "VLTG"), 
-                                    `CH` = c("V1CH", "V2CH", "V3CH", "V4CH", "V5CH", "VLCH"), 
-                                    `FC` = c("V1FC", "V2FC", "V3FC", "V4FC", "V5FC", "VLFC"), 
-                                    `CE` = c("V1CE", "V2CE", "V3CE", "V4CE", "V5CE", "VLCE_perc"), 
-                                    `PL` = c("V1PL", "V2PL", "V3PL", "V4PL", "V5PL", "VLPL")))
+if(subfractions == T){
+  plotCombos <- list(`main` = plotCombos,
+    `LDL Subfraction` = list(`TG` = c("L1TG", "L2TG", "L3TG", "L4TG", "L5TG", "L6TG"),
+                                                 `CH` = c("L1CH", "L2CH", "L3CH", "L4CH", "L5CH", "L6CH"),
+                                                 `FC` = c("L1FC", "L2FC", "L3FC", "L4FC", "L5FC", "L6FC"), 
+                                                 `CE` = c("L1CE", "L2CE", "L3CE", "L4CE", "L5CE", "L6CE"),
+                                                 `PL` = c("L1PL", "L2PL", "L3PL", "L4PL", "L5PL", "L6PL")),
+                        `HDL Subfraction` = list(`TG` = c("H1TG", "H2TG", "H3TG", "H4TG"), 
+                                                 `CH` = c("H1CH", "H2CH", "H3CH", "H4CH"), 
+                                                 `FC` = c("H1FC", "H2FC", "H3FC", "H4FC"), 
+                                                 `CE` = c("H1CE", "H2CE", "H3CE", "H4CE"), 
+                                                 `PL` = c("H1PL", "H2PL", "H3PL", "H4PL")), 
+                        `VLDL Subfraction` = list(`TG` = c("V1TG", "V2TG", "V3TG", "V4TG", "V5TG"), 
+                                                  `CH` = c("V1CH", "V2CH", "V3CH", "V4CH", "V5CH"), 
+                                                  `FC` = c("V1FC", "V2FC", "V3FC", "V4FC", "V5FC"), 
+                                                  `CE` = c("V1CE", "V2CE", "V3CE", "V4CE", "V5CE"), 
+                                                  `PL` = c("V1PL", "V2PL", "V3PL", "V4PL", "V5PL")))
+}else{plotCombos <- list(`main` = plotCombos)}
 
-#graphCombos
-# `Lipoprotein Composition` = c("HDTL","VLTL","IDTL","LDTL")
+lipoData$cohort <- as.factor((as.factor(lipoData$category)))
+unique_factors <- unique(lipoData$cohort)
 
+all <- cbind(calc, perc)
+all$cohort <- lipoData$cohort
 
-lipoproteins <- c(plotCombos[["Lipoprotein Composition"]], "cohort")
-medians <- aggregate(. ~ cohort, data = all, function(x) median(x, na.rm = TRUE))
+all[is.na(all)] <- 0
+all[sapply(all, is.infinite)] <- 0
+
+#plotting
+piePlot <- list()
+for(j in names(plotCombos)){
+  for(i in names(plotCombos[[j]])){
+    lipoproteins <- c(plotCombos[[j]][[i]], "cohort")
 
 medians <- aggregate(. ~ cohort, data = all[,lipoproteins], function(x) median(x, na.rm = TRUE))
 medians$total <- rowSums(medians[, -which(names(medians) == "cohort")])
@@ -637,61 +629,124 @@ for (col in names(medians)[-which(names(medians) %in% c("cohort", "total"))]) {
   medians[[col]] <- round((medians[[col]] / medians$total) * 100, 2)
 }
 
-medians<-
-medians[,-which(names(medians) %in% c("total"))]
+medians <- medians[,-which(names(medians) %in% c("total"))]
 
-category <- `Lipoprotein Composition`
-  for (category in names(newnames)) {
-    for (oldname in names(newnames[[category]])) {
-      newname <- newnames[[category]][oldname]
-      if (oldname %in% colnames(medians)) {
-        colnames(medians)[colnames(medians) == oldname] <- newname
+
+  #rename for graph purposes
+  # category <- "Lipoprotein Composition"
+  if(j == 'main'){
+    for (category in names(newnames)) {
+      for (oldname in names(newnames[[category]])) {
+        newname <- newnames[[category]][oldname]
+        if (oldname %in% colnames(medians)) {
+          colnames(medians)[colnames(medians) == oldname] <- newname
+        }
+      }
+    }
+  } else{
+    #remove suffix
+    end <- c("TG", "CH", "FC", "CE", "PL")
+    for(k in end){
+      colnames(medians) <- gsub(pattern = k, replacement = "", x = colnames(medians))
+
+      #rename prefix
+      replacement <- list("H" = "HDL", "L" = "LDL", "V" = "VLDL")
+      for (pattern in names(replacement)) {
+        colnames(medians) <- gsub(pattern = paste0("(^|[^A-Za-z])", pattern, "(?![A-Za-z])"), replacement = replacement[[pattern]], x = colnames(medians), perl = TRUE)
       }
     }
   }
-
-# Reshape the data from wide to long format
+  
+#reshape data
 long_data <- reshape(
   medians,
-  varying = list(names(medians[,-which(names(medians) %in% c("cohort"))])),
+  varying = list(names(medians)[-which(names(medians) %in% c("cohort"))]),
   v.names = "y",
   idvar = "cohort",
-  times = names(medians)[2:5],
-  timevar = "subfraction",
+  times = names(medians)[-which(names(medians) %in% c("cohort"))],
+  timevar = "Subfraction",
   direction = "long"
 )
 
 # Remove the row.names column added by reshape
 long_data <- long_data[order(long_data$cohort), ]
 long_data$labels <- paste0(long_data$y, " %")
-long_data$subfraction <- as.factor(long_data$subfraction)
+long_data$Subfraction <- as.factor(long_data$Subfraction)
 long_data$label_pos <- NA
 
-#   calculate_label_pos <- function(df) {
-#     df$label_pos <- cumsum(df$y) - 0.5 * df$y
-#     return(df)
-#   }
-# 
-# # Split the data by cohort, apply the function, and combine the results
-# long_data <- do.call(rbind, lapply(split(long_data, long_data$cohort), calculate_label_pos))
-
-long_data <- 
-  do.call(what = rbind, 
+long_data <-
+  do.call(what = rbind,
           args = lapply(split(long_data, long_data$cohort), function(df) {
   df$label_pos <- cumsum(df$y) - 0.5 * df$y
   return(df)
 }))
 
-piePlot <-
-ggplot(data = long_data, aes(x = "", y = y, fill = subfraction)) +
+if(j == 'main'){
+  title <- paste0(i)
+}else{
+  title <- paste0(j, " (", i, ")")
+}
+ 
+
+piePlot[[j]][[i]] <-
+ggplot(data = long_data, aes(x = "", y = y, fill = Subfraction)) +
   geom_bar(stat = "identity", width = 1, color = "white") +
   coord_polar("y", start = 0) +
   theme_void() +
   facet_wrap(~cohort)+
-  labs(title = "Lipoprotein subfraction distribution")
+  labs(title = title)
+
+
+  }
+}
+
+
+load("~/git/phenological/mva-plots/data/lipoData.rda")
+df <- lipoData[,1:112]
+test <- lipoPieChart(data = df, subfractions = T)
 
 
 
+
+i = "TG"  
+
+  dat1%>%
+    select(cohort,starts_with("perc.H")& ends_with(i))%>%
+    rename_with( ~ gsub("H","HDL",gsub(i,"",gsub("perc.", "", .x, fixed = TRUE))))%>%
+    select(!HDLD)%>%
+    mutate(cohort = factor(cohort,levels = c("Control","COVID","MISC")))%>%
+    dplyr::group_by(cohort)%>%
+    summarise(
+      med_HDL1 = median(HDL1,na.rm = TRUE),
+      med_HDL2 = median(HDL2,na.rm = TRUE),
+      med_HDL3 = median(HDL3,na.rm = TRUE),
+      med_HDL4 = median(HDL4,na.rm = TRUE),
+      total= med_HDL1+med_HDL2+med_HDL3+med_HDL4
+    )%>%
+    mutate(
+      HDL1 = round((med_HDL1/total)*100,2),
+      HDL2 = round((med_HDL2/total)*100,2),
+      HDL3 = round((med_HDL3/total)*100,2),
+      HDL4 = round((med_HDL4/total)*100,2),
+    )%>%
+    select(cohort,HDL1:HDL4)%>%
+    pivot_longer(cols = !cohort,
+                 names_to = "subfraction",
+                 values_to = "y")%>%
+    mutate(pct_labels = paste(y, "%"))%>%
+    group_by(cohort) %>%
+    arrange(cohort, subfraction) %>%
+    mutate(label_pos = cumsum(y) - 0.5 * y)%>%
+    ggplot( aes(x = "", y = y, fill = subfraction)) +
+    geom_bar(stat = "identity", width = 1, color = "white") +
+    coord_polar("y", start = 0) +
+    theme_void() +
+    facet_wrap(~cohort)+
+    labs(title = paste0("HDL-",i," subfraction"))->pie1
+  
+  plot(pie1)
+  
+  
 
 
 

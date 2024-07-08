@@ -1,4 +1,4 @@
-pieChart <- function(data, cohort, multiCohort = F){
+lipoPieChart <- function(data, cohort = F, subfractions = T, multiCohort = F){
 
  #create data frame
   if(is(data)[1] == "dataElement"){
@@ -20,18 +20,18 @@ pieChart <- function(data, cohort, multiCohort = F){
 
 
 
-  data<-data[,which(colnames(data) %in% lipo_name)]
-  tdf<-apply(data,1,as.list)
-  tdf1<-lapply(tdf, as.data.frame)
-  melt_and_rename <- function(df) {
-    df_long  = stack(df)
-    colnames(df_long) = c("value","id")
-    return(df_long)
-  }
-  tdf2 <- lapply(tdf1, melt_and_rename)
-  data<-lapply(tdf2, function(x) extend_lipo(x))
-  data<-data.frame(do.call("rbind",data))
-  return(data)
+  # data<-data[,which(colnames(data) %in% lipo_name)]
+  # tdf<-apply(data,1,as.list)
+  # tdf1<-lapply(tdf, as.data.frame)
+  # melt_and_rename <- function(df) {
+  #   df_long  = stack(df)
+  #   colnames(df_long) = c("value","id")
+  #   return(df_long)
+  # }
+  # tdf2 <- lapply(tdf1, melt_and_rename)
+  # data<-lapply(tdf2, function(x) extend_lipo(x))
+  # data<-data.frame(do.call("rbind",data))
+  # return(data)
 
  #create the required column (all in the names already)
  calc <- data.frame(
@@ -118,5 +118,268 @@ pieChart <- function(data, cohort, multiCohort = F){
  
  colnames(perc)[colnames(perc) %in% c("HDCE", "VLCE", "IDCE", "LDCE")] <- paste0(colnames(perc)[colnames(perc) %in% c("HDCE", "VLCE", "IDCE", "LDCE")], "_perc")
  
-
+ #####plots######
+ plotCombos <- list(`Lipoprotein Composition` = c("HDTL", "IDTL", "LDTL", "VLTL"),
+                    `Particle Numbers` = c("VLPN","IDPN","L1PN","L2PN","L3PN","L4PN","L5PN","L6PN"),
+                    `HDL Distribution` = c("HDTG" , "HDFC", "HDCE_perc" , "HDPL" ),
+                    `LDL Distribution` = c("LDCE_perc" , "LDFC" , "LDPL", "LDTG" ),
+                    `IDL Distribution` = c("IDCE_perc" , "IDFC", "IDPL" , "IDTG"),
+                    `VLDL Distribution` = c("VLCE_perc", "VLFC", "VLPL", "VLTG"))
+ 
+ newnames <- list(
+   `Lipoprotein Composition` = c("HDTL" = "HDL", "IDTL" = "IDL", "LDTL" = "LDL", "VLTL" = "VLDL"),
+   `Particle Numbers` = c("VLPN" = "VLDL", "IDPN" = "IDL", "L1PN" = "LDL1", "L2PN" = "LDL2", "L3PN" = "LDL3", "L4PN" = "LDL4", "L5PN" = "LDL5", "L6PN" = "LDL6"),
+   `HDL Distribution` = c("HDTG" = "TG", "HDFC" = "FC", "HDCE_perc" = "CE", "HDPL" = "PL"),
+   `LDL Distribution` = c("LDCE_perc" = "CE", "LDFC" = "FC", "LDPL" = "PL", "LDTG" = "TG"),
+   `IDL Distribution` = c("IDCE_perc" = "CE", "IDFC" = "FC", "IDPL" ="PL", "IDTG" ="TG"),
+   `VLDL Distribution` = c("VLCE_perc" = "CE", "VLFC" = "FC", "VLPL" = "PL", "VLTG" = "TG")
+ )
+ 
+ if(subfractions == T){
+   plotCombos <- list(`main` = plotCombos,
+                      `LDL Subfraction` = list(`TG` = c("L1TG", "L2TG", "L3TG", "L4TG", "L5TG", "L6TG"),
+                                               `CH` = c("L1CH", "L2CH", "L3CH", "L4CH", "L5CH", "L6CH"),
+                                               `FC` = c("L1FC", "L2FC", "L3FC", "L4FC", "L5FC", "L6FC"), 
+                                               `CE` = c("L1CE", "L2CE", "L3CE", "L4CE", "L5CE", "L6CE"),
+                                               `PL` = c("L1PL", "L2PL", "L3PL", "L4PL", "L5PL", "L6PL")),
+                      `HDL Subfraction` = list(`TG` = c("H1TG", "H2TG", "H3TG", "H4TG"), 
+                                               `CH` = c("H1CH", "H2CH", "H3CH", "H4CH"), 
+                                               `FC` = c("H1FC", "H2FC", "H3FC", "H4FC"), 
+                                               `CE` = c("H1CE", "H2CE", "H3CE", "H4CE"), 
+                                               `PL` = c("H1PL", "H2PL", "H3PL", "H4PL")), 
+                      `VLDL Subfraction` = list(`TG` = c("V1TG", "V2TG", "V3TG", "V4TG", "V5TG"), 
+                                                `CH` = c("V1CH", "V2CH", "V3CH", "V4CH", "V5CH"), 
+                                                `FC` = c("V1FC", "V2FC", "V3FC", "V4FC", "V5FC"), 
+                                                `CE` = c("V1CE", "V2CE", "V3CE", "V4CE", "V5CE"), 
+                                                `PL` = c("V1PL", "V2PL", "V3PL", "V4PL", "V5PL")))
+ }else{plotCombos <- list(`main` = plotCombos)}
+ 
+ lipoData$cohort <- as.factor((as.factor(lipoData$category)))
+ unique_factors <- unique(lipoData$cohort)
+ 
+ all <- cbind(calc, perc)
+ all$cohort <- lipoData$cohort
+ 
+ all[is.na(all)] <- 0
+ all[sapply(all, is.infinite)] <- 0
+ 
+ #plotting
+ piePlot <- list()
+ for(j in names(plotCombos)){
+   for(i in names(plotCombos[[j]])){
+     lipoproteins <- c(plotCombos[[j]][[i]], "cohort")
+     
+     medians <- aggregate(. ~ cohort, data = all[,lipoproteins], function(x) median(x, na.rm = TRUE))
+     medians$total <- rowSums(medians[, -which(names(medians) == "cohort")])
+     
+     for (col in names(medians)[-which(names(medians) %in% c("cohort", "total"))]) {
+       medians[[col]] <- round((medians[[col]] / medians$total) * 100, 2)
+     }
+     
+     medians <- medians[,-which(names(medians) %in% c("total"))]
+     
+     
+     #rename for graph purposes
+     # category <- "Lipoprotein Composition"
+     if(j == 'main'){
+       for (category in names(newnames)) {
+         for (oldname in names(newnames[[category]])) {
+           newname <- newnames[[category]][oldname]
+           if (oldname %in% colnames(medians)) {
+             colnames(medians)[colnames(medians) == oldname] <- newname
+           }
+         }
+       }
+     } else{
+       #remove suffix
+       end <- c("TG", "CH", "FC", "CE", "PL")
+       for(k in end){
+         colnames(medians) <- gsub(pattern = k, replacement = "", x = colnames(medians))
+         
+         #rename prefix
+         replacement <- list("H" = "HDL", "L" = "LDL", "V" = "VLDL")
+         for (pattern in names(replacement)) {
+           colnames(medians) <- gsub(pattern = paste0("(^|[^A-Za-z])", pattern, "(?![A-Za-z])"), replacement = replacement[[pattern]], x = colnames(medians), perl = TRUE)
+         }
+       }
+     }
+     
+     #reshape data
+     long_data <- reshape(
+       medians,
+       varying = list(names(medians)[-which(names(medians) %in% c("cohort"))]),
+       v.names = "y",
+       idvar = "cohort",
+       times = names(medians)[-which(names(medians) %in% c("cohort"))],
+       timevar = "Subfraction",
+       direction = "long"
+     )
+     
+     # Remove the row.names column added by reshape
+     long_data <- long_data[order(long_data$cohort), ]
+     long_data$labels <- paste0(long_data$y, " %")
+     long_data$Subfraction <- as.factor(long_data$Subfraction)
+     long_data$label_pos <- NA
+     
+     long_data <-
+       do.call(what = rbind,
+               args = lapply(split(long_data, long_data$cohort), function(df) {
+                 df$label_pos <- cumsum(df$y) - 0.5 * df$y
+                 return(df)
+               }))
+     
+     if(j == 'main'){
+       title <- paste0(i)
+     }else{
+       title <- paste0(j, " (", i, ")")
+     }
+     
+     
+     piePlot[[j]][[i]] <-
+       ggplot(data = long_data, aes(x = "", y = y, fill = Subfraction)) +
+       geom_bar(stat = "identity", width = 1, color = "white") +
+       coord_polar("y", start = 0) +
+       theme_void() +
+       facet_wrap(~cohort)+
+       labs(title = title)
+     
+     
+   }
+ }
+ 
+ #####Tables#########
+ lipoData$cohort <- as.factor(as.numeric(as.factor(lipoData$category)))
+ unique_factors <- unique(lipoData$cohort)
+ 
+ all <- cbind(calc, perc)
+ all$cohort <- lipoData$cohort
+ 
+ all[is.na(all)] <- 0
+ all[sapply(all, is.infinite)] <- 0
+ 
+ 
+ ########tables
+ tableCombos = list(`Lipoprotein Composition` = c("HDCE", "HDTL", "IDCE", "IDTL", "LDCE", "LDTL", "TBPN", "VLCE", "VLTL"),
+                    `Particle Numbers` = c("TBPN", "VLPN","IDPN","L1PN","L2PN","L3PN","L4PN","L5PN","L6PN"),
+                    `HDL Distribution` = c("HDTG", "HDCH", "HDFC", "HDCE_perc", "HDPL"),
+                    `LDL Distribution` = c("LDCE_perc", "LDCH", "LDFC", "LDPL", "LDTG"),
+                    `IDL Distribution` = c("IDCE_perc", "IDCH", "IDFC", "IDPL", "IDPN", "IDTG"),
+                    `VLDL Distribution` = c("VLCE_perc", "VLCH", "VLFC", "VLPL", "VLPN", "VLTG")
+ )
+ 
+ #subfractions
+ if(subfractions == T){
+   tableCombos = list(`main` = tableCombos,
+                      `LDL Subfraction` = list(`TG` = c("L1TG", "L2TG", "L3TG", "L4TG", "L5TG", "L6TG", "LDTG"),
+                                               `CH` = c("L1CH", "L2CH", "L3CH", "L4CH", "L5CH", "L6CH", "LDCH"),
+                                               `FC` = c("L1FC", "L2FC", "L3FC", "L4FC", "L5FC", "L6FC", "LDFC"), 
+                                               `CE` = c("L1CE", "L2CE", "L3CE", "L4CE", "L5CE", "L6CE", "LDCE"),
+                                               `PL` = c("L1PL", "L2PL", "L3PL", "L4PL", "L5PL", "L6PL", "LDPL")),
+                      `HDL Subfraction` = list(`TG` = c("H1TG", "H2TG", "H3TG", "H4TG", "HDTG"), 
+                                               `CH` = c("H1CH", "H2CH", "H3CH", "H4CH", "HDCH"), 
+                                               `FC` = c("H1FC", "H2FC", "H3FC", "H4FC", "HDFC"), 
+                                               `CE` = c("H1CE", "H2CE", "H3CE", "H4CE", "HDCE"), 
+                                               `PL` = c("H1PL", "H2PL", "H3PL", "H4PL", "HDPL")), 
+                      `VLDL Subfraction` = list(`TG` = c("V1TG", "V2TG", "V3TG", "V4TG", "V5TG", "VLTG"), 
+                                                `CH` = c("V1CH", "V2CH", "V3CH", "V4CH", "V5CH", "VLCH"), 
+                                                `FC` = c("V1FC", "V2FC", "V3FC", "V4FC", "V5FC", "VLFC"), 
+                                                `CE` = c("V1CE", "V2CE", "V3CE", "V4CE", "V5CE", "VLCE"), 
+                                                `PL` = c("V1PL", "V2PL", "V3PL", "V4PL", "V5PL", "VLPL")))
+ } else {tableCombos = list(`main` = tableCombos)}
+ 
+ 
+ 
+ #set up 
+ if(length(unique_factors) == 2){
+   col <- 3
+ } else{
+   col <- 2 + (sum(1:length(unique_factors))-length(unique_factors))
+ }
+ 
+ combinations <- combn(unique_factors, 2)
+ 
+ # Create column names from the combinations with the larger letter first
+ column_names <- apply(combinations, 2, function(x) paste(sort(x, decreasing = TRUE), collapse = "-"))
+ 
+ #create a list for the table and fill them with all combinations of groups for significance
+ tabs <- list()
+ for(j in names(tableCombos)){
+   for(i in names(tableCombos[[j]])){
+     lipoproteins <- tableCombos[[j]][[i]]
+     
+     sig <- as.data.frame(matrix(NA, nrow = length(lipoproteins), ncol = col))
+     
+     colnames(sig) <- c("lipoproteins", "pval", column_names)
+     sig$lipoproteins <- lipoproteins
+     
+     for(lipo in lipoproteins){
+       anova_model <- aov(as.formula(paste(lipo, "~ cohort")), data = all)
+       tukey_results <- TukeyHSD(anova_model)
+       # Extract p-values
+       idx <- which(sig$lipoproteins == lipo)
+       sig[idx, "pval"] <- as.numeric(summary(anova_model)[[1]]$`Pr(>F)`[1])
+       tukey_pvalues <- tukey_results$cohort
+       
+       #put the tukey results in the correct columns
+       for (name in rownames(tukey_pvalues)) {
+         if (name %in% colnames(sig)) {
+           sig[idx, name] <- 
+             # tukey_pvalues[name, 4]
+             
+             if(tukey_pvalues[name, 4] < 0.05 & tukey_pvalues[name, 4] >= 0.01){"*"
+             }else if (tukey_pvalues[name, 4] < 0.01 & tukey_pvalues[name, 4] >= 0.001) {
+               "**"
+             } else if (tukey_pvalues[name, 4] < 0.001) {
+               "***"
+             } else {
+               ""
+             }
+         }
+       }
+     }
+     
+     # Create a mapping between numbers and words, rename columns appropriately 
+     mapping <- setNames(unique(lipoData$category), unique(lipoData$cohort))
+     
+     testnames<- as.data.frame(mapping, check.names = F)
+     testnames$rowName <- rownames(testnames)
+     
+     new_colnames <- colnames(sig)
+     for (num in names(mapping)) {
+       new_colnames <- gsub(num, mapping[num], new_colnames)
+     }
+     colnames(sig) <- new_colnames
+     
+     # Calculate mean and sd for each 'cohort' group and each 'calc' column
+     agg_mean <- melt(aggregate(. ~ cohort, data = all, FUN = mean), id.vars = "cohort")
+     agg_sd <- melt(aggregate(. ~ cohort, data = all, FUN = sd), id.vars = "cohort")
+     
+     new <- merge(x = agg_mean, y = agg_sd, by = c("cohort", "variable"))
+     new$`mean±sd` <- paste0(round(new$value.x, 2), " ± ", round(new$value.y, 2))
+     new <- new[,which(!(colnames(new) %in% c("value.x", "value.y")))]
+     
+     result <- dcast(new, variable ~ cohort, value.var = "mean±sd")
+     #rename using mapping
+     new_colnames <- colnames(result)
+     for (num in names(mapping)) {
+       new_colnames <- gsub(num, mapping[num], new_colnames)
+     }
+     colnames(result) <- new_colnames
+     
+     tble <- merge(result, sig, by.x = "variable", by.y = "lipoproteins")
+     
+     #remove the _perc where necessary
+     tble$variable <- gsub(pattern = "_perc", replacement = "", x = tble$variable)
+     
+     tabs[[j]][[i]] <- tble
+     
+   }
+   
+ }
+ 
+ results<- list("tables" = tabs,
+                "pieCharts" = piePlot)
+ 
+ return(results)
+ 
 }
