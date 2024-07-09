@@ -1,5 +1,22 @@
-lipoPieChart <- function(data, cohort = F, subfractions = T, multiCohort = F){
+#' lipoPieChart
+#' Pie charts and tables for lipoproteins.
+#' 
+#' @param data A data frame of the lipoproteins.
+#' @param group A character vector of the groups the same length as the data, 
+#' for example Female_HighBMI, Female_LowBMI, Male_HighBMI, Male_LowBMI.
+#' @param cohort A character vector of the cohorts the same length as the data. 
+#' Used to facet rows of the pie charts.
+#' @param subfractions Logical for if subfractions of HDL, VLDL and LDL should
+#' be produced. Default is TRUE. 
+#' @import stats
+#' @import ggplot2
+#' @import reshape2
+#' @export
 
+lipoPieChart <- function(data, group, subfractions = T, cohort = F, optns = list()){
+
+  
+  
  #create data frame
   if(is(data)[1] == "dataElement"){
     data <- as.data.frame(apply(data@.Data,2,as.numeric))
@@ -16,22 +33,6 @@ lipoPieChart <- function(data, cohort = F, subfractions = T, multiCohort = F){
   if(length(which(lipo_name %in% colnames(df))) != 112){
     stop("some lipoprotein parameters does not match")
   }
-
-
-
-
-  # data<-data[,which(colnames(data) %in% lipo_name)]
-  # tdf<-apply(data,1,as.list)
-  # tdf1<-lapply(tdf, as.data.frame)
-  # melt_and_rename <- function(df) {
-  #   df_long  = stack(df)
-  #   colnames(df_long) = c("value","id")
-  #   return(df_long)
-  # }
-  # tdf2 <- lapply(tdf1, melt_and_rename)
-  # data<-lapply(tdf2, function(x) extend_lipo(x))
-  # data<-data.frame(do.call("rbind",data))
-  # return(data)
 
  #create the required column (all in the names already)
  calc <- data.frame(
@@ -153,12 +154,14 @@ lipoPieChart <- function(data, cohort = F, subfractions = T, multiCohort = F){
                                                 `CE` = c("V1CE", "V2CE", "V3CE", "V4CE", "V5CE"), 
                                                 `PL` = c("V1PL", "V2PL", "V3PL", "V4PL", "V5PL")))
  }else{plotCombos <- list(`main` = plotCombos)}
+ df$group <- (as.factor(group))
+ df$cohort <- as.factor(cohort)
  
- lipoData$cohort <- as.factor((as.factor(lipoData$category)))
- unique_factors <- unique(lipoData$cohort)
+ unique_factors <- unique(df$group)
  
  all <- cbind(calc, perc)
- all$cohort <- lipoData$cohort
+ all$group <- df$group
+ all$cohort <- df$cohort
  
  all[is.na(all)] <- 0
  all[sapply(all, is.infinite)] <- 0
@@ -167,12 +170,12 @@ lipoPieChart <- function(data, cohort = F, subfractions = T, multiCohort = F){
  piePlot <- list()
  for(j in names(plotCombos)){
    for(i in names(plotCombos[[j]])){
-     lipoproteins <- c(plotCombos[[j]][[i]], "cohort")
+     lipoproteins <- c(plotCombos[[j]][[i]], "group", "cohort")
      
-     medians <- aggregate(. ~ cohort, data = all[,lipoproteins], function(x) median(x, na.rm = TRUE))
-     medians$total <- rowSums(medians[, -which(names(medians) == "cohort")])
+     medians <- aggregate(. ~ group, data = all[,lipoproteins], function(x) median(x, na.rm = TRUE))
+     medians$total <- rowSums(medians[, -which(names(medians) %in% c("group", "cohort"))])
      
-     for (col in names(medians)[-which(names(medians) %in% c("cohort", "total"))]) {
+     for (col in names(medians)[-which(names(medians) %in% c("group", "cohort", "total"))]) {
        medians[[col]] <- round((medians[[col]] / medians$total) * 100, 2)
      }
      
@@ -207,26 +210,20 @@ lipoPieChart <- function(data, cohort = F, subfractions = T, multiCohort = F){
      #reshape data
      long_data <- reshape(
        medians,
-       varying = list(names(medians)[-which(names(medians) %in% c("cohort"))]),
+       varying = list(names(medians)[-which(names(medians) %in% c("group", "cohort"))]),
        v.names = "y",
-       idvar = "cohort",
-       times = names(medians)[-which(names(medians) %in% c("cohort"))],
+       idvar = c("group", "cohort"),
+       times = names(medians)[-which(names(medians) %in% c("group", "cohort"))],
        timevar = "Subfraction",
        direction = "long"
      )
+  
+     long_data <- long_data[order(long_data$group, long_data$cohort, long_data$Subfraction, decreasing = TRUE), ]
      
-     # Remove the row.names column added by reshape
-     long_data <- long_data[order(long_data$cohort), ]
-     long_data$labels <- paste0(long_data$y, " %")
-     long_data$Subfraction <- as.factor(long_data$Subfraction)
-     long_data$label_pos <- NA
-     
-     long_data <-
-       do.call(what = rbind,
-               args = lapply(split(long_data, long_data$cohort), function(df) {
-                 df$label_pos <- cumsum(df$y) - 0.5 * df$y
-                 return(df)
-               }))
+     # Calculate proportions and positions
+     long_data$prop <- ave(long_data$y, long_data$group, long_data$cohort, FUN = function(x) x / sum(x))
+     long_data$ypos <- ave(long_data$prop, long_data$group, long_data$cohort, FUN = function(x) cumsum(x) - 0.5 * x)
+     long_data$label <- scales::percent(long_data$prop, accuracy = 0.1)
      
      if(j == 'main'){
        title <- paste0(i)
@@ -234,25 +231,41 @@ lipoPieChart <- function(data, cohort = F, subfractions = T, multiCohort = F){
        title <- paste0(j, " (", i, ")")
      }
      
-     
      piePlot[[j]][[i]] <-
-       ggplot(data = long_data, aes(x = "", y = y, fill = Subfraction)) +
-       geom_bar(stat = "identity", width = 1, color = "white") +
-       coord_polar("y", start = 0) +
+     ggplot(data = long_data, 
+            aes(x = "", 
+                y = prop, 
+                fill = Subfraction)) +
+       geom_bar(width = 1, 
+                stat = "identity", 
+                color = "white", 
+                alpha = 0.8) +
+       coord_polar("y", 
+                   start = 0) +
        theme_void() +
-       facet_wrap(~cohort)+
-       labs(title = title)
-     
-     
+       facet_grid(rows = vars(cohort), 
+                  cols = vars(group)) +
+       labs(title = title) +
+       # geom_text(aes(y = ypos, label = label), size = 3, color = "black") +
+       geom_text_repel(
+         aes(y = ypos, 
+             label = label),
+         nudge_x = 0.5,
+         show.legend = FALSE,
+         segment.size = 0.2,
+         segment.color = 'grey50'
+       )
+       # scale_fill_brewer(palette = "Set1")
+ 
    }
  }
  
  #####Tables#########
- lipoData$cohort <- as.factor(as.numeric(as.factor(lipoData$category)))
- unique_factors <- unique(lipoData$cohort)
+ df$group <- as.factor(as.numeric(as.factor(group)))
+ unique_factors <- unique(df$group)
  
  all <- cbind(calc, perc)
- all$cohort <- lipoData$cohort
+ all$group <- df$group
  
  all[is.na(all)] <- 0
  all[sapply(all, is.infinite)] <- 0
@@ -313,12 +326,12 @@ lipoPieChart <- function(data, cohort = F, subfractions = T, multiCohort = F){
      sig$lipoproteins <- lipoproteins
      
      for(lipo in lipoproteins){
-       anova_model <- aov(as.formula(paste(lipo, "~ cohort")), data = all)
+       anova_model <- aov(as.formula(paste(lipo, "~ group")), data = all)
        tukey_results <- TukeyHSD(anova_model)
        # Extract p-values
        idx <- which(sig$lipoproteins == lipo)
        sig[idx, "pval"] <- as.numeric(summary(anova_model)[[1]]$`Pr(>F)`[1])
-       tukey_pvalues <- tukey_results$cohort
+       tukey_pvalues <- tukey_results$group
        
        #put the tukey results in the correct columns
        for (name in rownames(tukey_pvalues)) {
@@ -339,7 +352,7 @@ lipoPieChart <- function(data, cohort = F, subfractions = T, multiCohort = F){
      }
      
      # Create a mapping between numbers and words, rename columns appropriately 
-     mapping <- setNames(unique(lipoData$category), unique(lipoData$cohort))
+     mapping <- setNames(unique(group), unique(df$group))
      
      testnames<- as.data.frame(mapping, check.names = F)
      testnames$rowName <- rownames(testnames)
@@ -350,15 +363,15 @@ lipoPieChart <- function(data, cohort = F, subfractions = T, multiCohort = F){
      }
      colnames(sig) <- new_colnames
      
-     # Calculate mean and sd for each 'cohort' group and each 'calc' column
-     agg_mean <- melt(aggregate(. ~ cohort, data = all, FUN = mean), id.vars = "cohort")
-     agg_sd <- melt(aggregate(. ~ cohort, data = all, FUN = sd), id.vars = "cohort")
+     # Calculate mean and sd for each 'group' group and each 'calc' column
+     agg_mean <- melt(aggregate(. ~ group, data = all, FUN = mean), id.vars = "group")
+     agg_sd <- melt(aggregate(. ~ group, data = all, FUN = sd), id.vars = "group")
      
-     new <- merge(x = agg_mean, y = agg_sd, by = c("cohort", "variable"))
+     new <- merge(x = agg_mean, y = agg_sd, by = c("group", "variable"))
      new$`mean±sd` <- paste0(round(new$value.x, 2), " ± ", round(new$value.y, 2))
      new <- new[,which(!(colnames(new) %in% c("value.x", "value.y")))]
      
-     result <- dcast(new, variable ~ cohort, value.var = "mean±sd")
+     result <- dcast(new, variable ~ group, value.var = "mean±sd")
      #rename using mapping
      new_colnames <- colnames(result)
      for (num in names(mapping)) {
