@@ -742,8 +742,8 @@ if(subfractions == T){
 piePlot <- list()
 for(j in names(plotCombos)){
   for(i in names(plotCombos[[j]])){
-    j <- "main"
-    i <- "Lipoprotein Composition"
+    # j <- "main"
+    # i <- "Lipoprotein Composition"
     lipoproteins <- c(plotCombos[[j]][[i]], "group", "cohort")
     
     medians <- aggregate(. ~ group + cohort, data = all[,lipoproteins], function(x) median(x, na.rm = TRUE))
@@ -808,7 +808,7 @@ for(j in names(plotCombos)){
       geom_text(aes(y = ypos, label = label), size = 3, color = "white") +
       scale_fill_brewer(palette = "Set1")
     
-    
+ ##########################   
     
     
     
@@ -850,24 +850,24 @@ for(j in names(plotCombos)){
       #   segment.color = 'grey50'
       # )
    
-   SubSegment<- c('S1','S2','S3','S4')
-   v <- c(100, 300, 500, 200)
-   df<- cbind.data.frame(SubSegment, v)
-   
-   #calculations for % labels in chart
-   df <- df %>% 
-     arrange(desc(SubSegment)) %>%
-     mutate(prop = v / sum(df$v)) %>%
-     mutate(ypos = cumsum(prop)- 0.5*prop ) %>%
-     mutate(label= prop*1)
-   df[5] = sapply(df[5], function(x) scales::percent(x, accuracy = 0.1))
-   
-   plot.ex <- ggplot(df, aes(x = "", y = prop, fill = SubSegment)) +
-     geom_bar(width = 1, stat = "identity", color="white", alpha=0.8) +
-     coord_polar("y", start = 0) +
-     theme_void() + 
-     geom_text(aes(y = ypos, label = label), size=3, color = "white") +
-     scale_fill_brewer(palette="Set1") 
+   # SubSegment<- c('S1','S2','S3','S4')
+   # v <- c(100, 300, 500, 200)
+   # df<- cbind.data.frame(SubSegment, v)
+   # 
+   # #calculations for % labels in chart
+   # df <- df %>% 
+   #   arrange(desc(SubSegment)) %>%
+   #   mutate(prop = v / sum(df$v)) %>%
+   #   mutate(ypos = cumsum(prop)- 0.5*prop ) %>%
+   #   mutate(label= prop*1)
+   # df[5] = sapply(df[5], function(x) scales::percent(x, accuracy = 0.1))
+   # 
+   # plot.ex <- ggplot(df, aes(x = "", y = prop, fill = SubSegment)) +
+   #   geom_bar(width = 1, stat = "identity", color="white", alpha=0.8) +
+   #   coord_polar("y", start = 0) +
+   #   theme_void() + 
+   #   geom_text(aes(y = ypos, label = label), size=3, color = "white") +
+   #   scale_fill_brewer(palette="Set1") 
   }
 }
 
@@ -1131,8 +1131,14 @@ test_that("works with subfractions",{
   
   expect_equal(object = length(names(test[["tables"]])), expected = 4)
   
+  #are the main plots there
+  expect_contains(object = names(test[["pieCharts"]][["main"]]), expected = c("Lipoprotein Composition", "Particle Numbers", "HDL Distribution",   "LDL Distribution",  "IDL Distribution" ,"VLDL Distribution"  ))
+
+  #are the sub-fraction plots there
+  expect_contains(object = names(test[["pieCharts"]]), expected = c("LDL Subfraction",  "HDL Subfraction",  "VLDL Subfraction"))
+  expect_contains(object = names(test[["pieCharts"]][["HDL Subfraction"]]), expected = c("TG", "CH", "FC", "CE", "PL"))
   
-})
+  })
 
 
 
@@ -1143,7 +1149,7 @@ test_that("works without subfractions",{
   test <- lipoPieChart(data = df, group = lipoData$category, subfractions = F)
   
   expect_equal(object = length(names(test[["tables"]])), expected = 1)
-  
+  expect_false(object = "HDL Subfraction" %in% names(test$pieCharts))
 })
 
 test_that("three groups works", {
@@ -1159,4 +1165,17 @@ test_that("three groups works", {
   expect_contains(object = groups, expected = c("C-A", "C-B", "B-A"))
 })
 
-
+test_that("multiple cohorts works", {
+  load("~/git/phenological/mva-plots/data/lipoData.rda")
+  lipoData$cohort<- rep_len(x = "Aus", length.out = nrow(lipoData))
+  lipoData2 <- lipoData
+  lipoData2$cohort<- rep_len(x = "USA", length.out = nrow(lipoData))
+  df <- rbind(lipoData, lipoData2)
+  # group <- df$category
+  # cohort <- df$cohort
+  
+  test <- lipoPieChart(data = df[,1:112], group = df$category, cohort = df$cohort, subfractions = F)
+  
+  
+  
+})

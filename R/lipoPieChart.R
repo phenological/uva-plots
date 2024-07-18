@@ -11,12 +11,11 @@
 #' @import stats
 #' @import ggplot2
 #' @import reshape2
+#' @import ggrepel
 #' @export
 
-lipoPieChart <- function(data, group, subfractions = T, cohort = F, optns = list()){
+lipoPieChart <- function(data, group, subfractions = T, cohort = 1, optns = list()){
 
-  
-  
  #create data frame
   if(is(data)[1] == "dataElement"){
     data <- as.data.frame(apply(data@.Data,2,as.numeric))
@@ -33,6 +32,11 @@ lipoPieChart <- function(data, group, subfractions = T, cohort = F, optns = list
   if(length(which(lipo_name %in% colnames(df))) != 112){
     stop("some lipoprotein parameters does not match")
   }
+  
+  #is there multiple cohorts
+  # if(length(cohort) == 1){
+  #   cohort <- rep_len(x = 1, length.out = nrow(data))
+  # }
 
  #create the required column (all in the names already)
  calc <- data.frame(
@@ -170,9 +174,10 @@ lipoPieChart <- function(data, group, subfractions = T, cohort = F, optns = list
  piePlot <- list()
  for(j in names(plotCombos)){
    for(i in names(plotCombos[[j]])){
+
      lipoproteins <- c(plotCombos[[j]][[i]], "group", "cohort")
      
-     medians <- aggregate(. ~ group, data = all[,lipoproteins], function(x) median(x, na.rm = TRUE))
+     medians <- aggregate(. ~ group + cohort, data = all[,lipoproteins], function(x) median(x, na.rm = TRUE))
      medians$total <- rowSums(medians[, -which(names(medians) %in% c("group", "cohort"))])
      
      for (col in names(medians)[-which(names(medians) %in% c("group", "cohort", "total"))]) {
