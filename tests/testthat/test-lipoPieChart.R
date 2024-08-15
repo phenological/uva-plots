@@ -278,7 +278,7 @@ tableCombos = list(`Lipoprotein Composition` = c("HDCE", "HDTL", "IDCE", "IDTL",
 #subfractions
 subfractions <- TRUE
 if(subfractions == T){
-  tableCombos = list(`main` = tableCombos,
+  tableCombos = list(`main composition` = tableCombos,
                      `LDL Subfraction` = list(`TG` = c("L1TG", "L2TG", "L3TG", "L4TG", "L5TG", "L6TG", "LDTG"),
                                   `CH` = c("L1CH", "L2CH", "L3CH", "L4CH", "L5CH", "L6CH", "LDCH"),
                                   `FC` = c("L1FC", "L2FC", "L3FC", "L4FC", "L5FC", "L6FC", "LDFC"), 
@@ -294,7 +294,7 @@ if(subfractions == T){
                                    `FC` = c("V1FC", "V2FC", "V3FC", "V4FC", "V5FC", "VLFC"), 
                                    `CE` = c("V1CE", "V2CE", "V3CE", "V4CE", "V5CE", "VLCE"), 
                                    `PL` = c("V1PL", "V2PL", "V3PL", "V4PL", "V5PL", "VLPL")))
-} else {tableCombos = list(`main` = tableCombos)}
+} else {tableCombos = list(`main composition` = tableCombos)}
 
 
 
@@ -315,7 +315,7 @@ trial <- list()
 for(j in names(tableCombos)){
   for(i in names(tableCombos[[j]])){
     lipoproteins <- tableCombos[[j]][[i]]
-    j = "main"
+    j = "main composition"
     i = "Lipoprotein Composition"
     sig <- as.data.frame(matrix(NA, nrow = length(lipoproteins), ncol = col))
     
@@ -482,7 +482,7 @@ newnames <- list(
 )
 
 if(subfractions == T){
-  plotCombos <- list(`main` = plotCombos,
+  plotCombos <- list(`main composition` = plotCombos,
     `LDL Subfraction` = list(`TG` = c("L1TG", "L2TG", "L3TG", "L4TG", "L5TG", "L6TG"),
                                                  `CH` = c("L1CH", "L2CH", "L3CH", "L4CH", "L5CH", "L6CH"),
                                                  `FC` = c("L1FC", "L2FC", "L3FC", "L4FC", "L5FC", "L6FC"), 
@@ -498,7 +498,7 @@ if(subfractions == T){
                                                   `FC` = c("V1FC", "V2FC", "V3FC", "V4FC", "V5FC"), 
                                                   `CE` = c("V1CE", "V2CE", "V3CE", "V4CE", "V5CE"), 
                                                   `PL` = c("V1PL", "V2PL", "V3PL", "V4PL", "V5PL")))
-}else{plotCombos <- list(`main` = plotCombos)}
+}else{plotCombos <- list(`main composition` = plotCombos)}
 
 # lipoData$group <- as.factor((as.factor(lipoData$category)))
 # unique_factors <- unique(lipoData$group)
@@ -527,7 +527,7 @@ if(subfractions == T){
 # 
 #   #rename for graph purposes
 #   # category <- "Lipoprotein Composition"
-#   if(j == 'main'){
+#   if(j == 'main composition'){
 #     for (category in names(newnames)) {
 #       for (oldname in names(newnames[[category]])) {
 #         newname <- newnames[[category]][oldname]
@@ -574,7 +574,7 @@ if(subfractions == T){
 #   return(df)
 # }))
 # 
-# if(j == 'main'){
+# if(j == 'main composition'){
 #   title <- paste0(i)
 # }else{
 #   title <- paste0(j, " (", i, ")")
@@ -721,7 +721,7 @@ newnames <- list(
 )
 
 if(subfractions == T){
-  plotCombos <- list(`main` = plotCombos,
+  plotCombos <- list(`main composition` = plotCombos,
                      `LDL Subfraction` = list(`TG` = c("L1TG", "L2TG", "L3TG", "L4TG", "L5TG", "L6TG"),
                                               `CH` = c("L1CH", "L2CH", "L3CH", "L4CH", "L5CH", "L6CH"),
                                               `FC` = c("L1FC", "L2FC", "L3FC", "L4FC", "L5FC", "L6FC"), 
@@ -737,12 +737,12 @@ if(subfractions == T){
                                                `FC` = c("V1FC", "V2FC", "V3FC", "V4FC", "V5FC"), 
                                                `CE` = c("V1CE", "V2CE", "V3CE", "V4CE", "V5CE"), 
                                                `PL` = c("V1PL", "V2PL", "V3PL", "V4PL", "V5PL")))
-}else{plotCombos <- list(`main` = plotCombos)}
+}else{plotCombos <- list(`main composition` = plotCombos)}
 #plotting
 piePlot <- list()
 for(j in names(plotCombos)){
   for(i in names(plotCombos[[j]])){
-    # j <- "main"
+    # j <- "main composition"
     # i <- "Lipoprotein Composition"
     lipoproteins <- c(plotCombos[[j]][[i]], "group", "cohort")
     
@@ -756,7 +756,7 @@ for(j in names(plotCombos)){
     medians <- medians[,-which(names(medians) %in% c("total"))]
     
     #rename for graph purposes
-    if(j == 'main'){
+    if(j == 'main composition'){
       for (category in names(newnames)) {
         for (oldname in names(newnames[[category]])) {
           newname <- newnames[[category]][oldname]
@@ -828,7 +828,7 @@ for(j in names(plotCombos)){
               }))
     
     
-    if(j == 'main'){
+    if(j == 'main composition'){
       title <- paste0(i)
     }else{
       title <- paste0(j, " (", i, ")")
@@ -899,7 +899,7 @@ tableCombos = list(`Lipoprotein Composition` = c("HDCE", "HDTL", "IDCE", "IDTL",
 #subfractions
 
 if(subfractions == T){
-  tableCombos = list(`main` = tableCombos,
+  tableCombos = list(`main composition` = tableCombos,
                      `LDL Subfraction` = list(`TG` = c("L1TG", "L2TG", "L3TG", "L4TG", "L5TG", "L6TG", "LDTG"),
                                               `CH` = c("L1CH", "L2CH", "L3CH", "L4CH", "L5CH", "L6CH", "LDCH"),
                                               `FC` = c("L1FC", "L2FC", "L3FC", "L4FC", "L5FC", "L6FC", "LDFC"), 
@@ -915,7 +915,7 @@ if(subfractions == T){
                                                `FC` = c("V1FC", "V2FC", "V3FC", "V4FC", "V5FC", "VLFC"), 
                                                `CE` = c("V1CE", "V2CE", "V3CE", "V4CE", "V5CE", "VLCE"), 
                                                `PL` = c("V1PL", "V2PL", "V3PL", "V4PL", "V5PL", "VLPL")))
-} else {tableCombos = list(`main` = tableCombos)}
+} else {tableCombos = list(`main composition` = tableCombos)}
 
 
 
@@ -936,7 +936,7 @@ trial <- list()
 for(j in names(tableCombos)){
   for(i in names(tableCombos[[j]])){
     lipoproteins <- tableCombos[[j]][[i]]
-    j = "main"
+    j = "main composition"
     i = "Lipoprotein Composition"
     sig <- as.data.frame(matrix(NA, nrow = length(lipoproteins), ncol = col))
     
@@ -1011,132 +1011,22 @@ for(j in names(tableCombos)){
 
 
 ############etablished test##############
-test_that("lipoprotein data frame made correctly ", {
-  
-  load("~/git/phenological/mva-plots/data/lipoData.rda")
-  
-  
-  df <- lipoData[,1:112]
-  
-  #create the required column (all in the names already)
-  calc <- data.frame(
-    HDTL = df$HDTG + df$HDCH + df$HDPL,
-    HDCE = df$HDCH - df$HDFC,
-    VLTL = df$VLTG + df$VLCH + df$VLPL,
-    VLCE = df$VLCH - df$VLFC,
-    IDTL = df$IDTG + df$IDCH + df$IDPL,
-    IDCE = df$IDCH - df$IDFC,
-    LDTL = df$LDTG + df$LDCH + df$LDPL,
-    LDCE = df$LDCH - df$LDFC,
-    TBPN = df$VLPN + df$IDPN + df$L1PN + df$L2PN + df$L3PN + df$L4PN + df$L5PN + df$L6PN,
-    HDA1 = df$H1A1 + df$H2A1 + df$H3A1 + df$H4A1,
-    HDA2 = df$H1A2 + df$H2A2 + df$H3A2 + df$H4A2,
-    LDAB = df$L1AB + df$L2AB + df$L3AB + df$L4AB + df$L5AB + df$L6AB
-  )
-  
-  #create percentage df use calc and df
-  #initialisation (6 rows)
-  perc <- data.frame(
-    HDCE = round(calc$HDCE / calc$HDTL, 4) * 100,
-    VLCE = round(calc$VLCE / calc$VLTL, 4) * 100,
-    IDCE = round(calc$IDCE / calc$IDTL, 4) * 100,
-    LDCE = round(calc$LDCE / calc$LDTL, 4) * 100,
-    VLPN = round(df$VLPN / calc$TBPN, 4) * 100,
-    IDPN = round(df$IDPN / calc$TBPN, 4) * 100
-  )
-  
-  letters <- c("H", "V", "L")
-  ranges <- list(H = 1:4, V = 1:5, L = 1:6)
-  prefixes <- c("HD", "VL", "ID", "LD")
-  suffixes <- c("TG", "CH", "FC", "PL")
-  suffixes2 <- c("A1", "A2")
-  
-  for (letter in letters) {
-    for (i in ranges[[letter]]) {
-      ch_col <- paste0(letter, i, "CH")
-      fc_col <- paste0(letter, i, "FC")
-      ce_col <- paste0(letter, i, "CE")
-      calc_col <- if (letter == "V") "VLCE" else paste0(letter, "DCE")
-      perc[[ce_col]] <- round((df[[ch_col]] - df[[fc_col]]) / calc[[calc_col]], 4) * 100
-    }
-  }
-  
-  for (letter in letters) {
-    for (i in ranges[[letter]]) {
-      for (suffix in suffixes) {
-        for (prefix in prefixes){
-          if (prefix == "ID") next  # Skip "ID"
-          col <- paste0(letter, i, suffix)
-          col2 <- paste0(prefix, suffix)
-          perc[[col]] <- round(df[[col]] / df[[col2]], 4) * 100
-        }
-      }
-    }
-  }
-  
-  for (prefix in prefixes) {
-    for (suffix in suffixes) {
-      col <- paste0(prefix, suffix)
-      calc_col <- paste0(prefix, "TL")
-      perc[[col]] <- round(df[[col]] / calc[[calc_col]], 4) * 100
-    }
-  }
-  
-  for (i in ranges[["H"]]) {
-    for (suffix in suffixes2) {
-      col <- paste0("H", i, suffix)
-      calc_col <- paste0("HD", suffix)
-      perc[[col]] <- round(df[[col]] / calc[[calc_col]], 4) * 100
-    }
-  }
-  
-  for (i in ranges[["L"]]) {
-    col <- paste0("L", i, "AB")
-    calc_col <- paste0("LDAB")
-    perc[[col]] <- round(df[[col]] / calc[[calc_col]], 4) * 100
-    
-    col <- paste0("L", i, "PN")
-    calc_col <- paste0("TBPN")
-    perc[[col]] <- round(df[[col]] / calc[[calc_col]], 4) * 100
-  }
-  
-  colnames(perc)[colnames(perc) %in% c("HDCE", "VLCE", "IDCE", "LDCE")] <- paste0(colnames(perc)[colnames(perc) %in% c("HDCE", "VLCE", "IDCE", "LDCE")], "_perc")
-  
-  #there should not be an duplicates of names from calc in perc. If there is, change them to have _perc.
-  m <- colnames(calc) %in% colnames(perc)
-  expect_false(object = TRUE %in% m)
-  
-  
-})
 
-test_that("table is made", {
-  
-  #set up 3 groups for lipoData instead of 2
-  a_indices <- which(lipoData$category == "A")
-  a_to_change <- sample(a_indices, ceiling(length(a_indices) / 3))
-  lipoData$category[a_to_change] <- "C"
-  
-  # Change a third of "B" entries to "C"
-  b_indices <- which(lipoData$category == "B")
-  b_to_change <- sample(b_indices, ceiling(length(b_indices) / 3))
-  lipoData$category[b_to_change] <- "C"
-})
-
-
-test_that("works with subfractions",{
+test_that("works with subfractions and subcompositions",{
   
   load("~/git/phenological/mva-plots/data/lipoData.rda")
   df <- lipoData[,1:112]
-  test <- lipoPieChart(data = df, group = lipoData$category, subfractions = T)
+  test <- lipoPieChart(data = df, group = lipoData$category, subfractions = T, subcompositions = T)
   
   expect_equal(object = length(names(test[["tables"]])), expected = 4)
   
-  #are the main plots there
-  expect_contains(object = names(test[["pieCharts"]][["main"]]), expected = c("Lipoprotein Composition", "Particle Numbers", "HDL Distribution",   "LDL Distribution",  "IDL Distribution" ,"VLDL Distribution"  ))
+  #are the main composition plots there
+  expect_contains(object = names(test[["pieCharts"]][["main composition"]]), expected = c("Lipoprotein Composition", "Particle Numbers", "HDL Distribution",   "LDL Distribution",  "IDL Distribution" ,"VLDL Distribution"  ))
 
-  #are the sub-fraction plots there
-  expect_contains(object = names(test[["pieCharts"]]), expected = c("LDL Subfraction",  "HDL Subfraction",  "VLDL Subfraction"))
+  #are the sub-fraction and sub-composition plots there
+  expect_contains(object = names(test[["pieCharts"]]), expected = c("LDL Subfraction",  "HDL Subfraction",  "VLDL Subfraction", "LDL Subcomposition",  "HDL Subcomposition",  "VLDL Subcomposition"))
   expect_contains(object = names(test[["pieCharts"]][["HDL Subfraction"]]), expected = c("TG", "CH", "FC", "CE", "PL"))
+  expect_contains(object = names(test[["pieCharts"]][["HDL Subcomposition"]]), expected = c("H1", "H2", "H3", "H4"))
   
   })
 
@@ -1146,7 +1036,7 @@ test_that("works without subfractions",{
   
   load("~/git/phenological/mva-plots/data/lipoData.rda")
   df <- lipoData[,1:112]
-  test <- lipoPieChart(data = df, group = lipoData$category, subfractions = F)
+  test <- lipoPieChart(data = df, group = lipoData$category, subfractions = F, subcompositions = F)
   
   expect_equal(object = length(names(test[["tables"]])), expected = 1)
   expect_false(object = "HDL Subfraction" %in% names(test$pieCharts))
@@ -1156,12 +1046,12 @@ test_that("three groups works", {
   load("~/git/phenological/mva-plots/data/lipoData.rda")
   lipoData$category[sample(nrow(lipoData),35)]<-"C"
   df <- lipoData[,1:112]
-  test <- lipoPieChart(data = df, group = lipoData$category, subfractions = F)
-  groups <- unique(test[["pieCharts"]][["main"]][["Lipoprotein Composition"]][["data"]][["group"]])
+  test <- lipoPieChart(data = df, group = lipoData$category, subfractions = F, subcompositions = F)
+  groups <- unique(test[["pieCharts"]][["main composition"]][["Lipoprotein Composition"]][["data"]][["group"]])
   
   expect_contains(object = groups, expected = c("A", "B", "C"))
   
-  groups <- colnames(test[["tables"]][["main"]][["Lipoprotein Composition"]])
+  groups <- colnames(test[["tables"]][["main composition"]][["Lipoprotein Composition"]])
   expect_contains(object = groups, expected = c("C-A", "C-B", "B-A"))
 })
 
@@ -1171,11 +1061,13 @@ test_that("multiple cohorts works", {
   lipoData2 <- lipoData
   lipoData2$cohort<- rep_len(x = "USA", length.out = nrow(lipoData))
   df <- rbind(lipoData, lipoData2)
-  # group <- df$category
-  # cohort <- df$cohort
   
   test <- lipoPieChart(data = df[,1:112], group = df$category, cohort = df$cohort, subfractions = F)
-  
-  
+
+  test[["pieCharts"]][["LDL Subcomposition"]][["L3"]]
   
 })
+
+
+
+
