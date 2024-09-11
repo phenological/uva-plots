@@ -10,7 +10,7 @@ lipoPieChart(
   group,
   subfractions = T,
   subcompositions = T,
-  cohort = 1,
+  cohort = "1",
   optns = list()
 )
 }
@@ -31,7 +31,11 @@ so what portion does each of the raw V1TG, V1CH, V1PL contribute to the
 calculated V1TL.}
 
 \item{cohort}{A character vector of the cohorts the same length as the data.
-Used to facet rows of the pie charts.}
+Used to facet rows of the pie charts. If only one cohort is used, can supply
+just the name of the cohort as a character "AUS" for example. If no cohort
+label desired leave as default, 1, and no label will appear.}
+
+\item{optns}{empty list for future non-essential arguments.}
 }
 \description{
 lipoPieChart

@@ -5,7 +5,9 @@
 #' @param group A character vector of the groups the same length as the data, 
 #' for example Female_HighBMI, Female_LowBMI, Male_HighBMI, Male_LowBMI.
 #' @param cohort A character vector of the cohorts the same length as the data. 
-#' Used to facet rows of the pie charts.
+#' Used to facet rows of the pie charts. If only one cohort is used, can supply
+#' just the name of the cohort as a character "AUS" for example. If no cohort 
+#' label desired leave as default, 1, and no label will appear. 
 #' @param subfractions Logical for if subfractions of HDL, VLDL and LDL should
 #' be produced. Default is TRUE. looks at subfractions considering the lipid 
 #' distribution, so what portion do each of V1TG, V2TG, V3TG, V4TG, V5TG 
@@ -14,18 +16,29 @@
 #' should be produced. Looks at subfractions considering the lipid composition, 
 #' so what portion does each of the raw V1TG, V1CH, V1PL contribute to the 
 #' calculated V1TL.
+#' @param optns empty list for future non-essential arguments. 
 #' @import fusion
 #' @import stats
 #' @import ggplot2
 #' @import reshape2
 #' @import ggrepel
+#' @importFrom utils combn
+#' @importFrom scales percent
 #' @export
 
-lipoPieChart <- function(data, group, subfractions = T, subcompositions = T, cohort = 1, optns = list()){
+lipoPieChart <- function(data, group, subfractions = T, subcompositions = T, cohort = "1", optns = list()){
 
   #use fusion, which uses nmr.parser, to extend the lipo data
 
- df <- extendLipo(data = data) 
+ df <- as.data.frame(extendLipo(data = data))
+ 
+ #if there is only one cohort and the default 1 remains, don't label plot by cohort
+  if(length(cohort) == 1){
+    if(cohort == 1){
+      theme <- theme(strip.text.y = element_blank()) 
+    } else{theme <- theme()}
+    
+  } else{theme <- theme()}
  
  #####plots######
  plotCombos <- list(`Lipoprotein Composition` = c("HDTL_calc", "IDTL_calc", "LDTL_calc", "VLTL_calc"),
@@ -169,7 +182,7 @@ lipoPieChart <- function(data, group, subfractions = T, subcompositions = T, coh
      # Calculate proportions and positions
      long_data$prop <- ave(long_data$y, long_data$group, long_data$cohort, FUN = function(x) x / sum(x))
      long_data$ypos <- ave(long_data$prop, long_data$group, long_data$cohort, FUN = function(x) cumsum(x) - 0.5 * x)
-     long_data$label <- scales::percent(long_data$prop, accuracy = 0.1)
+     long_data$label <- percent(long_data$prop, accuracy = 0.1)
      
      if(j == 'main composition'){
        title <- paste0(i)
@@ -200,7 +213,8 @@ lipoPieChart <- function(data, group, subfractions = T, subcompositions = T, coh
          show.legend = FALSE,
          segment.size = 0.2,
          segment.color = 'grey50'
-       )
+       ) + 
+       theme
      # scale_fill_brewer(palette = "Set1")
      
    }
