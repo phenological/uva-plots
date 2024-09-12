@@ -4,7 +4,7 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of uva.plots is to ...
+The intended purpose of uva.plots is visualisations of univariate data analysis. 
 
 ## Installation
 
